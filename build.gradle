@@ -53,6 +53,11 @@ tasks.register('updateGitHook', Copy) {
 	}
 }
 
+tasks.register('installIntellijCodeStyle', Copy) {
+	from(rootProject.file("config/intellij/codeStyles"))
+	into(rootProject.file(".idea/codeStyles"))
+}
+
 spotless {
 	java {
 		removeUnusedImports()
