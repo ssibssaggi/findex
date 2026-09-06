@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -e
+
+staged_files="$(mktemp)"
+stash_created=false
+
+cleanup() {
+	status=$?
+
+	rm -f "$staged_files"
+
+	if [ "$stash_created" = true ]; then
+		echo "[git stash] unstaged 변경사항 복원중 ..."
+		git stash pop --quiet || status=1
+	fi
+
+	exit "$status"
+}
+trap cleanup EXIT
+
+git diff --cached --name-only --diff-filter=ACMR -z > "$staged_files"
+
+if ! git diff --quiet; then
+	echo "[git stash] unstaged 변경사항 임시 보관중 ..."
+	git stash push --quiet --keep-index --message "pre-commit: keep unstaged changes"
+	stash_created=true
+fi
+
+echo "[spotlessApply] Spotless Formatting 적용중 ..."
+./gradlew spotlessApply
+./gradlew spotlessCheck
+
+echo "[git add] 기존 staging 파일의 Spotless 적용 결과를 staging area에 반영중 ..."
+if [ -s "$staged_files" ]; then
+	xargs -0 git add -- < "$staged_files"
+fi
+
+echo "[CheckStyle] CheckStyle 검사중 ..."
+./gradlew checkstyleMain checkstyleTest

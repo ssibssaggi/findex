@@ -2,6 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.1.1'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.diffplug.spotless' version '8.10.1'
+	id 'checkstyle'
 }
 
 group = 'com.ssibssaggi'
@@ -34,4 +36,35 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.register('updateGitHook', Copy) {
+	def gitHooks = ["pre-commit", "commit-msg"]
+	def gitHookPath = ".git/hooks"
+
+	from(rootProject.file("scripts")) {
+		include(gitHooks)
+	}
+	into(rootProject.file(gitHookPath))
+	doLast {
+		gitHooks.forEach {hook ->
+			file(gitHookPath + "/$hook").setExecutable(true, false)
+		}
+	}
+}
+
+spotless {
+	java {
+		removeUnusedImports()
+		googleJavaFormat().aosp()
+		importOrder('java', 'javax', 'jakarta', 'org', 'com', '', '\\#')
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+}
+
+checkstyle {
+	toolVersion = '10.12.4'
+	maxWarnings = 0
+	configFile = file("config/checkstyle/google_checks.xml")
 }
