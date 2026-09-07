@@ -1,0 +1,89 @@
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
+import org.w3c.dom.Node
+import org.xml.sax.InputSource
+
+tasks.register('installIntellijActionsOnSave') {
+	group = 'IDE'
+	description = 'Enables Java reformatting and import optimization on save. Close the IDE project before running.'
+
+	def settingsFile = rootProject.file('config/intellij/actionsOnSave.xml')
+	def workspaceFile = rootProject.file('.idea/workspace.xml')
+	inputs.file(settingsFile)
+	// Always merge: IntelliJ may have changed these options since the last installation.
+
+	doLast {
+		def factory = DocumentBuilderFactory.newInstance()
+		factory.setFeature('http://apache.org/xml/features/disallow-doctype-decl', true)
+		def parser = factory.newDocumentBuilder()
+		def settings = parser.parse(settingsFile)
+		def original = workspaceFile.exists() ? workspaceFile.getText('UTF-8') : null
+		def workspace = original != null
+				? parser.parse(new InputSource(new StringReader(original)))
+				: parser.parse(new InputSource(new StringReader('<project version="4" />')))
+		if (workspace.documentElement.tagName != 'project' || settings.documentElement.tagName != 'project') {
+			throw new GradleException('IntelliJ settings must have a <project> root element.')
+		}
+
+		def elements = { node ->
+			(0..<node.childNodes.length).collect { node.childNodes.item(it) }
+					.findAll { it.nodeType == Node.ELEMENT_NODE }
+		}
+		elements(settings.documentElement).each { desiredComponent ->
+			def component = elements(workspace.documentElement).find {
+				it.tagName == 'component' && it.getAttribute('name') == desiredComponent.getAttribute('name')
+			}
+			if (component == null) {
+				workspace.documentElement.appendChild(workspace.createTextNode('\n  '))
+				workspace.documentElement.appendChild(workspace.importNode((Node) desiredComponent, true))
+				workspace.documentElement.appendChild(workspace.createTextNode('\n'))
+			} else {
+				// Preserve other components and options, including personal workspace settings.
+				elements(desiredComponent).each { desiredOption ->
+					def existingOptions = elements(component).findAll {
+						it.tagName == 'option' && it.getAttribute('name') == desiredOption.getAttribute('name')
+					}
+					def replacement = workspace.importNode((Node) desiredOption, true)
+					if (existingOptions.empty) {
+						component.appendChild(replacement)
+					} else {
+						component.replaceChild(replacement, existingOptions.first())
+						existingOptions.drop(1).each { component.removeChild(it) }
+					}
+				}
+			}
+		}
+
+		def transformer = TransformerFactory.newInstance().newTransformer()
+		transformer.setOutputProperty(OutputKeys.ENCODING, 'UTF-8')
+		transformer.setOutputProperty(OutputKeys.INDENT, 'no')
+		def writer = new StringWriter()
+		transformer.transform(new DOMSource(workspace), new StreamResult(writer))
+		def updated = writer.toString()
+		if (updated != original) {
+			Files.createDirectories(workspaceFile.parentFile.toPath())
+			def temporary = Files.createTempFile(workspaceFile.parentFile.toPath(), 'workspace-', '.xml')
+			try {
+				Files.writeString(temporary, updated)
+				Files.move(temporary, workspaceFile.toPath(),
+						StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
+			} finally {
+				Files.deleteIfExists(temporary)
+			}
+		}
+		logger.lifecycle('IntelliJ Actions on Save installed: Java reformat (whole file) and optimize imports.')
+	}
+}
+
+tasks.register('installIntellijCodeStyle', Copy) {
+	group = 'IDE'
+	description = 'Installs the shared IntelliJ code style and Actions on Save settings.'
+	dependsOn tasks.named('installIntellijActionsOnSave')
+	from(rootProject.file('config/intellij/codeStyles'))
+	into(rootProject.file('.idea/codeStyles'))
+}
