@@ -18,14 +18,12 @@ public class IndexInformationApplication {
     public IndexInformationResponse saveInformation(IndexInformationRequest indexInformationRequest) {
         IndexInformation savedEntity = indexInformationService.save(indexInformationRequest, SourceType.USER);
 
-        return new IndexInformationResponse(savedEntity.getId(),
-                savedEntity.getIndexClassification(),
-                savedEntity.getIndexName(),
-                savedEntity.getEmployedItemsCount(),
-                savedEntity.getBasePointInTime().toString(),
-                savedEntity.getBaseIndex(),
-                savedEntity.getSourceType().toString(),
-                savedEntity.getFavorite()
-        );
+        return IndexInformationResponse.of(savedEntity);
+    }
+
+    public IndexInformationResponse findById(Long id) {
+        IndexInformation entity = indexInformationService.findById(id);
+        
+        return IndexInformationResponse.of(entity);
     }
 }
