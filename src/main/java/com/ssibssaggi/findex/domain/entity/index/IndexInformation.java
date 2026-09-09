@@ -19,7 +19,7 @@ public class IndexInformation {
     private String indexName;
     private Integer employedItemsCount;
     private LocalDate basePointInTime;
-    private Integer baseIndex;
+    private Float baseIndex;
     private SourceType sourceType;
     private Boolean favorite;
     private Boolean enabled;
