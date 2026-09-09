@@ -1,6 +1,7 @@
 package com.ssibssaggi.findex.domain.entity.integrationhistory;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,8 +23,8 @@ public class IntegrationHistory {
     private JobType jobtype;
     private LocalDate targetDate;
     private String worker;
-    private LocalDate jobTime;
-    private String result;
+    private LocalDateTime jobTime;
+    private IntegrationResult result;
 
     @ManyToOne
     @JoinColumn(name = "index_information_id")
