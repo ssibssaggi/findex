@@ -1,6 +1,7 @@
 package com.ssibssaggi.findex.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,5 +34,13 @@ public class IndexInformationController {
             @PathVariable Long id
     ) {
         return indexInformationApplication.findById(id);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping(value = "/api/index-infos/{id}")
+    public void deleteIndexInfoById(
+            @PathVariable Long id
+    ) {
+        indexInformationApplication.deleteById(id);
     }
 }

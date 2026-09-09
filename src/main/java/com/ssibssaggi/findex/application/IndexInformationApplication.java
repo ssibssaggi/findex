@@ -23,7 +23,11 @@ public class IndexInformationApplication {
 
     public IndexInformationResponse findById(Long id) {
         IndexInformation entity = indexInformationService.findById(id);
-        
+
         return IndexInformationResponse.of(entity);
+    }
+
+    public void deleteById(Long id) {
+        indexInformationService.delete(id);
     }
 }
