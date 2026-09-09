@@ -1,5 +1,7 @@
 package com.ssibssaggi.findex.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ssibssaggi.findex.application.IndexInformationApplication;
 import com.ssibssaggi.findex.controller.dto.IndexInformationCreateRequest;
 import com.ssibssaggi.findex.controller.dto.IndexInformationResponse;
+import com.ssibssaggi.findex.controller.dto.IndexInformationSummaryResponse;
 import com.ssibssaggi.findex.controller.dto.IndexInformationUpdateRequest;
 
 import lombok.RequiredArgsConstructor;
@@ -53,5 +56,11 @@ public class IndexInformationController {
             @RequestBody IndexInformationUpdateRequest indexInformationUpdateRequest
     ) {
         return indexInformationApplication.update(id, indexInformationUpdateRequest);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping(value = "/api/index-infos/summaries")
+    public List<IndexInformationSummaryResponse> getIndexInfoSummaries() {
+        return indexInformationApplication.findSummary();
     }
 }

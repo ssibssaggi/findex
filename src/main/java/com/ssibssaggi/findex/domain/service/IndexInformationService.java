@@ -1,5 +1,7 @@
 package com.ssibssaggi.findex.domain.service;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,5 +75,9 @@ public class IndexInformationService {
         );
 
         return entity;
+    }
+
+    public List<IndexInformation> findAll() {
+        return indexInformationRepository.findAll();
     }
 }

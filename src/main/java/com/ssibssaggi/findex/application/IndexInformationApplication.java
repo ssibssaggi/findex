@@ -1,9 +1,12 @@
 package com.ssibssaggi.findex.application;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.ssibssaggi.findex.controller.dto.IndexInformationCreateRequest;
 import com.ssibssaggi.findex.controller.dto.IndexInformationResponse;
+import com.ssibssaggi.findex.controller.dto.IndexInformationSummaryResponse;
 import com.ssibssaggi.findex.controller.dto.IndexInformationUpdateRequest;
 import com.ssibssaggi.findex.domain.entity.index.IndexInformation;
 import com.ssibssaggi.findex.domain.entity.index.SourceType;
@@ -39,5 +42,11 @@ public class IndexInformationApplication {
         IndexInformation entity = indexInformationService.update(id, indexInformationUpdateRequest);
 
         return IndexInformationResponse.of(entity);
+    }
+
+    public List<IndexInformationSummaryResponse> findSummary() {
+        return indexInformationService.findAll().stream()
+                .map(IndexInformationSummaryResponse::of)
+                .toList();
     }
 }
