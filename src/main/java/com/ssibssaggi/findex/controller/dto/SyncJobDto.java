@@ -6,16 +6,16 @@ import java.util.List;
 
 import jakarta.annotation.Nullable;
 
-import com.ssibssaggi.findex.domain.entity.index.SourceType;
 import com.ssibssaggi.findex.domain.entity.integrationhistory.IntegrationHistory;
 import com.ssibssaggi.findex.domain.entity.integrationhistory.IntegrationResult;
+import com.ssibssaggi.findex.domain.entity.integrationhistory.JobType;
 
 import lombok.Builder;
 import lombok.NonNull;
 
 @Builder
 public record SyncJobDto(@NonNull Long id,
-                         @NonNull SourceType jobType,
+                         @NonNull JobType jobType,
                          @NonNull Long indexInfoId,
                          @Nullable LocalDate targetDate,    // 지수 데이터 날짜
                          @NonNull String worker,
@@ -31,7 +31,7 @@ public record SyncJobDto(@NonNull Long id,
     private static SyncJobDto from(IntegrationHistory integrationHistory) {
         return SyncJobDto.builder()
                 .id(integrationHistory.getId())
-                .jobType(integrationHistory.getIndexInformation().getSourceType())
+                .jobType(integrationHistory.getJobtype())
                 .indexInfoId(integrationHistory.getIndexInformation().getId())
                 .targetDate(integrationHistory.getTargetDate())
                 .worker(integrationHistory.getWorker())
