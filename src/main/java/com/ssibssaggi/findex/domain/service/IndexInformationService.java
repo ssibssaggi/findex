@@ -2,9 +2,11 @@ package com.ssibssaggi.findex.domain.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ssibssaggi.findex.common.exception.CustomException;
-import com.ssibssaggi.findex.controller.dto.IndexInformationRequest;
+import com.ssibssaggi.findex.controller.dto.IndexInformationCreateRequest;
+import com.ssibssaggi.findex.controller.dto.IndexInformationUpdateRequest;
 import com.ssibssaggi.findex.domain.entity.index.IndexInformation;
 import com.ssibssaggi.findex.domain.entity.index.SourceType;
 import com.ssibssaggi.findex.repository.IndexInformationRepository;
@@ -16,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class IndexInformationService {
     private final IndexInformationRepository indexInformationRepository;
 
-    public IndexInformation save(IndexInformationRequest request, SourceType sourceType) {
+    public IndexInformation save(IndexInformationCreateRequest request, SourceType sourceType) {
         boolean isDuplicate = this.validateByIndexClassificationAndIndexName(request.indexClassification(),
                 request.indexName());
 
@@ -47,5 +49,29 @@ public class IndexInformationService {
                         HttpStatus.NOT_FOUND,
                         "삭제 요청 id : " + id + "번 - 정보가 존재하지 않습니다."));
         indexInformationRepository.delete(entity);
+    }
+
+    /**
+     * Transactional 사용이유 - Transactional을사용하지않았을때 Dirty Checking가 되지않아 명시적 save를 진행해야함 사용하면 필드를 변경하면 Dirty Checking를 통해
+     * 변경 감지하여 작업이 종료됨과 동시에 flush + commit을 진행해해주기 때문에 Transactional를사용함
+     */
+    @Transactional
+    public IndexInformation update(
+            Long id,
+            IndexInformationUpdateRequest indexInformationUpdateRequest
+    ) {
+        IndexInformation entity = indexInformationRepository.findById(id)
+                .orElseThrow(() -> new CustomException("잘못된 요청입니다.",
+                        HttpStatus.NOT_FOUND,
+                        "수정 요청 id : " + id + "번 - 정보가 존재하지 않습니다."));
+
+        entity.update(
+                indexInformationUpdateRequest.employedItemsCount(),
+                indexInformationUpdateRequest.basePointInTime(),
+                indexInformationUpdateRequest.baseIndex(),
+                indexInformationUpdateRequest.favorite()
+        );
+
+        return entity;
     }
 }

@@ -1,12 +1,9 @@
 package com.ssibssaggi.findex.controller.dto;
 
-public record IndexInformationRequest(
-        String indexName,
-        String indexClassification,
+public record IndexInformationUpdateRequest(
         Integer employedItemsCount,
         String basePointInTime,
-        Number baseIndex,
+        Integer baseIndex,
         Boolean favorite
 ) {
-
 }

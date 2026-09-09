@@ -7,7 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-import com.ssibssaggi.findex.controller.dto.IndexInformationRequest;
+import com.ssibssaggi.findex.controller.dto.IndexInformationCreateRequest;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +28,17 @@ public class IndexInformation {
     private Boolean favorite;
     private Boolean enabled;
 
-    public static IndexInformation create(IndexInformationRequest request, SourceType sourceType) {
+    public void update(
+            Integer employedItemsCount, String basePointInTime,
+            Integer baseIndex, Boolean favorite
+    ) {
+        this.employedItemsCount = employedItemsCount;
+        this.basePointInTime = LocalDate.parse(basePointInTime);
+        this.baseIndex = baseIndex;
+        this.favorite = favorite;
+    }
+
+    public static IndexInformation create(IndexInformationCreateRequest request, SourceType sourceType) {
         IndexInformation entity = new IndexInformation();
         entity.indexName = request.indexName();
         entity.indexClassification = request.indexClassification();
