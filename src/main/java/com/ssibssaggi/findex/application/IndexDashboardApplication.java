@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ssibssaggi.findex.common.exception.FindexException;
-import com.ssibssaggi.findex.common.exception.FindexException.ErrorCode;
+import com.ssibssaggi.findex.common.exception.CustomException;
 import com.ssibssaggi.findex.controller.dto.ChartPeriodType;
 import com.ssibssaggi.findex.controller.dto.IndexChartResponse;
 import com.ssibssaggi.findex.controller.dto.IndexPerformanceRankResponse;
@@ -54,8 +54,7 @@ public class IndexDashboardApplication {
     //2. 지수 차트
     public IndexChartResponse getChart(Long indexInformationId, ChartPeriodType periodType) {
         IndexInformation indexInformation = indexInformationJpaRepository.findById(indexInformationId)
-                .orElseThrow(() -> new FindexException(
-                        ErrorCode.INDEX_INFORMATION_NOT_FOUND,
+                .orElseThrow(() -> new CustomException("", HttpStatus.NOT_FOUND,
                         "지수 정보를 찾을 수 없습니다. id=" + indexInformationId));
 
         LocalDate toDate = LocalDate.now();
@@ -103,7 +102,7 @@ public class IndexDashboardApplication {
         return sum / windowSize;
     }
 
-    //3. 지수 성과 분석 랭킹
+    // ── 3. 지수 성과 분석 랭킹
     public List<IndexPerformanceRankResponse> getPerformanceRank(RankPeriodType periodType) {
         List<IndexInformation> enabledIndexInformations = indexInformationJpaRepository.findByIsEnabledTrue();
 

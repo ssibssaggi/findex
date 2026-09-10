@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ssibssaggi.findex.common.exception.FindexException;
-import com.ssibssaggi.findex.common.exception.FindexException.ErrorCode;
+import com.ssibssaggi.findex.common.exception.CustomException;
 import com.ssibssaggi.findex.domain.entity.index.IndexData;
 import com.ssibssaggi.findex.domain.entity.index.IndexInformation;
 import com.ssibssaggi.findex.domain.entity.index.SourceType;
@@ -38,11 +38,10 @@ public class IndexDataApplication {
 
         // 1. ID 기반으로 엔티티 조회
         IndexInformation indexInformation = indexInformationRepository.findById(indexInformationId)
-                .orElseThrow(() -> new FindexException(
-                        ErrorCode.INDEX_INFORMATION_NOT_FOUND,
+                .orElseThrow(() -> new CustomException("", HttpStatus.NOT_FOUND,
                         "지수 정보를 찾을 수 없습니다. id=" + indexInformationId));
 
-        // 2. 지수+날짜 중복 검증
+        // 2. 지수+날짜 중복 검증`
         validateIndexDataDoesNotExist(indexInformationId, baseDate);
 
         IndexData indexData = IndexData.builder()
@@ -70,8 +69,7 @@ public class IndexDataApplication {
             Long tradingQuantity, Long tradingPrice, Long marketTotalAmount) { // Integer -> Long 변경
 
         IndexData indexData = indexDataRepository.findById(id)
-                .orElseThrow(() -> new FindexException(
-                        ErrorCode.INDEX_DATA_NOT_FOUND,
+                .orElseThrow(() -> new CustomException("", HttpStatus.NOT_FOUND,
                         "지수 데이터를 찾을 수 없습니다. id=" + id));
 
         indexData.update(marketPrice, closingPrice, highPrice, lowPrice, versus,
@@ -83,13 +81,11 @@ public class IndexDataApplication {
     @Transactional
     public void delete(Long id) {
         IndexData indexData = indexDataRepository.findById(id)
-                .orElseThrow(() -> new FindexException(
-                        ErrorCode.INDEX_DATA_NOT_FOUND,
+                .orElseThrow(() -> new CustomException("", HttpStatus.NOT_FOUND,
                         "지수 데이터를 찾을 수 없습니다. id=" + id));
 
         if (!indexData.isUserSourced()) {
-            throw new FindexException(
-                    ErrorCode.INDEX_DATA_DELETION_FORBIDDEN,
+            throw new CustomException("", HttpStatus.NOT_FOUND,
                     "사용자가 직접 등록한 데이터만 삭제할 수 있습니다. id=" + id);
         }
 
@@ -111,8 +107,7 @@ public class IndexDataApplication {
 
     private void validateIndexDataDoesNotExist(Long indexInformationId, LocalDate baseDate) {
         if (indexDataRepository.existsByIndexInformationIdAndBaseDate(indexInformationId, baseDate)) {
-            throw new FindexException(
-                    ErrorCode.INDEX_DATA_DUPLICATE,
+            throw new CustomException("", HttpStatus.BAD_REQUEST,
                     "이미 존재하는 지수 데이터입니다. indexInformationId=" + indexInformationId
                             + ", baseDate=" + baseDate);
         }
