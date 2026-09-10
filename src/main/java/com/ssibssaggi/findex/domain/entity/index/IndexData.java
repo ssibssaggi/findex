@@ -31,17 +31,17 @@ public class IndexData {
     private Float lowPrice;
     private Float versus;
     private Float fluctuationRate;
-    private Long tradingQuantity;
-    private Long tradingPrice;
-    private Long marketTotalAmount;
+    private Integer tradingQuantity;
+    private Integer tradingPrice;
+    private Integer marketTotalAmount;
 
     @ManyToOne
     @JoinColumn(name = "index_information_id")
     private IndexInformation indexInformation;
 
     public void update(Float marketPrice, Float closingPrice, Float highPrice, Float lowPrice,
-            Float versus, Float fluctuationRate, Long tradingQuantity, Long tradingPrice,
-            Long marketTotalAmount) {
+            Float versus, Float fluctuationRate, Integer tradingQuantity, Integer tradingPrice,
+            Integer marketTotalAmount) {
         this.marketPrice = marketPrice;
         this.closingPrice = closingPrice;
         this.highPrice = highPrice;

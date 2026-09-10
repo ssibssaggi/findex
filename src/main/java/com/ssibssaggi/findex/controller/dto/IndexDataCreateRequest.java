@@ -11,9 +11,9 @@ public record IndexDataCreateRequest(
         Float lowPrice,
         Float versus,
         Float fluctuationRate,
-        Long tradingQuantity,
-        Long tradingPrice,
-        Long marketTotalAmount
+        Integer tradingQuantity,
+        Integer tradingPrice,
+        Integer marketTotalAmount
 ) {
 
 }

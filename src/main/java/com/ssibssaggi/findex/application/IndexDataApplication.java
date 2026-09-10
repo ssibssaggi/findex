@@ -34,7 +34,7 @@ public class IndexDataApplication {
     public IndexData register(Long indexInformationId, LocalDate baseDate, SourceType sourceType,
             Float marketPrice, Float closingPrice, Float highPrice,
             Float lowPrice, Float versus, Float fluctuationRate,
-            Long tradingQuantity, Long tradingPrice, Long marketTotalAmount) { // Integer -> Long 변경
+            Integer tradingQuantity, Integer tradingPrice, Integer marketTotalAmount) { // Integer -> Long 변경
 
         // 1. ID 기반으로 엔티티 조회
         IndexInformation indexInformation = indexInformationRepository.findById(indexInformationId)
@@ -66,7 +66,7 @@ public class IndexDataApplication {
     @Transactional
     public IndexData update(Long id, Float marketPrice, Float closingPrice, Float highPrice,
             Float lowPrice, Float versus, Float fluctuationRate,
-            Long tradingQuantity, Long tradingPrice, Long marketTotalAmount) { // Integer -> Long 변경
+            Integer tradingQuantity, Integer tradingPrice, Integer marketTotalAmount) { // Integer -> Long 변경
 
         IndexData indexData = indexDataRepository.findById(id)
                 .orElseThrow(() -> new CustomException("", HttpStatus.NOT_FOUND,
