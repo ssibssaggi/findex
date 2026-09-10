@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class IndexInformationApplication {
     private final IndexInformationService indexInformationService;
 
+    @Transactional
     public IndexInformationResponse saveInformation(IndexInformationCreateRequest indexInformationCreateRequest) {
         IndexInformation savedEntity = indexInformationService.createInformation(indexInformationCreateRequest);
 

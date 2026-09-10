@@ -78,9 +78,10 @@ public class IndexInformationService {
     }
 
     private boolean validateByIndexClassificationAndIndexName(String indexClassification, String indexName) {
-        return indexInformationRepository.findByIndexClassificationAndIndexName(
+        return indexInformationRepository.existsByIndexClassificationAndIndexName(
                 indexClassification,
-                indexName).isPresent();
+                indexName
+        );
     }
 
     public IndexInformation findById(Long id) {

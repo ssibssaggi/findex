@@ -12,5 +12,7 @@ public interface IndexInformationRepository
         extends JpaRepository<IndexInformation, Long>, IndexInformationRepositoryCustom {
     // SELECT * FROM index_information WHERE index_classification = ? AND index_name = ?;
     Optional<IndexInformation> findByIndexClassificationAndIndexName(String indexClassification, String indexName);
+
+    Boolean existsByIndexClassificationAndIndexName(String indexClassification, String indexName);
 }
 
