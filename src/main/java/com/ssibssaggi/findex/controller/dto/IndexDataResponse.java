@@ -19,8 +19,8 @@ public record IndexDataResponse(
         Float versus,
         Float fluctuationRate,
         Long tradingQuantity,
-        Float tradingPrice,
-        Float marketTotalAmount
+        Long tradingPrice,
+        Long marketTotalAmount
 ) {
 
     // IndexData 엔티티 -> IndexDataResponse 변환
