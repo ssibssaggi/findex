@@ -7,7 +7,7 @@ header="$(sed -n '1{s/\r$//;p;}' "$commit_msg_file")"       # 커밋 메시지 �
 second_line="$(sed -n '2{s/\r$//;p;}' "$commit_msg_file")"  # 커밋 메시지 본문, Windows에서 생성된 \r 줄바꿈 제거
 
 max_header_length=50
-type_pattern='(feat|fix|chore)'
+type_pattern='(✨feat|🐛fix|🔧chore)'
 header_pattern="^${type_pattern}(\([^()]+\))?: .+$"
 
 # 커밋 실패 시 출력할 로그
