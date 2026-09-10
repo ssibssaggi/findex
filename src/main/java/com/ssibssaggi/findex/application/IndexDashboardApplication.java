@@ -33,7 +33,7 @@ public class IndexDashboardApplication {
     // 1. 주요 지수 현황 요약
     public List<IndexPerformanceSummaryResponse> getFavoriteIndexSummary() {
         List<IndexInformation> favorites =
-                indexInformationJpaRepository.findByIsFavoriteTrueAndIsEnabledTrue();
+                indexInformationJpaRepository.findByFavoriteTrueAndEnabledTrue();
 
         List<IndexPerformanceSummaryResponse> favoriteIndexSummaries = new ArrayList<>();
         for (IndexInformation indexInformation : favorites) {
@@ -104,7 +104,7 @@ public class IndexDashboardApplication {
 
     // ── 3. 지수 성과 분석 랭킹
     public List<IndexPerformanceRankResponse> getPerformanceRank(RankPeriodType periodType) {
-        List<IndexInformation> enabledIndexInformations = indexInformationJpaRepository.findByIsEnabledTrue();
+        List<IndexInformation> enabledIndexInformations = indexInformationJpaRepository.findByEnabledTrue();
 
         LocalDate today = LocalDate.now();
         LocalDate compareDate = switch (periodType) {
