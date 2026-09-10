@@ -7,14 +7,21 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-//지수 자체의 정보
-@Getter
 @Entity
+@Getter
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"index_classification", "index_name"})
+})
 public class IndexInformation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +30,38 @@ public class IndexInformation {
     private String indexName;
     private Integer employedItemsCount;
     private LocalDate basePointInTime;
-    private Integer baseIndex;
+    private Float baseIndex;
     private SourceType sourceType;
-    @Column(name = "favorite")
-    private Boolean isFavorite;
-    @Column(name = "enabled")
-    private Boolean isEnabled;
+    private Boolean favorite;
+    private Boolean enabled;
+
+    public static IndexInformation createWithOpenApi(
+            String indexClassification,
+            String indexName,
+            Integer employedItemsCount,
+            LocalDate basePointInTime,
+            Float baseIndex
+    ) {
+        return new IndexInformation(
+                null,
+                indexClassification,
+                indexName,
+                employedItemsCount,
+                basePointInTime,
+                baseIndex,
+                SourceType.OPEN_API,
+                false,
+                false
+        );
+    }
+
+    public void updateWithOpenApi(
+            Integer employedItemsCount,
+            LocalDate basePointInTime,
+            Float baseIndex
+    ) {
+        this.employedItemsCount = employedItemsCount;
+        this.basePointInTime = basePointInTime;
+        this.baseIndex = baseIndex;
+    }
 }

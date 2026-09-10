@@ -1,6 +1,8 @@
 package com.ssibssaggi.findex.domain.entity.integrationhistory;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,23 +14,41 @@ import jakarta.persistence.ManyToOne;
 
 import com.ssibssaggi.findex.domain.entity.index.IndexInformation;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class IntegrationHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "jobtype")
-    private JobType jobType;
+    private JobType jobtype;
     private LocalDate targetDate;
     private String worker;
-    private LocalDate jobTime;
-    @Column(name = "result")
-    private String jobResult;
+    private LocalDateTime jobTime;
+    private IntegrationResult result;
 
     @ManyToOne
     @JoinColumn(name = "index_information_id")
     private IndexInformation indexInformation;
+
+    public static IntegrationHistory createIndexInformationHistory(
+            String worker,
+            IndexInformation indexInformation) {
+        return new IntegrationHistory(
+                null,
+                JobType.INDEX_INFO,
+                null,
+                worker,
+                LocalDateTime.now(ZoneId.systemDefault()),
+                IntegrationResult.SUCCESS,
+                indexInformation
+        );
+    }
 }
