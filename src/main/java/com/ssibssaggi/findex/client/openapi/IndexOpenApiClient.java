@@ -7,9 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+
+import com.ssibssaggi.findex.common.exception.CustomException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +37,11 @@ public class IndexOpenApiClient {
                         .accept(MediaType.APPLICATION_JSON)
                         .retrieve()
                         .body(IndexInfoApiResponse.class))
-                .orElseThrow();
+                .orElseThrow(() -> new CustomException(
+                        "OpenAPI 호출 오류",
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "OpenAPI 가 정상적으로 호출되지 않습니다."
+                ));
 
         return response.toIndexInfoApiItem();
     }
