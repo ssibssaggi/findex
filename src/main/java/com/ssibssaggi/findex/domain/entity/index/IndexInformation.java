@@ -9,6 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+import com.ssibssaggi.findex.controller.dto.IndexInformationCreateRequest;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +36,19 @@ public class IndexInformation {
     private Boolean favorite;
     private Boolean enabled;
 
+    public static IndexInformation createWithUser(IndexInformationCreateRequest request) {
+        IndexInformation entity = new IndexInformation();
+        entity.indexName = request.indexName();
+        entity.indexClassification = request.indexClassification();
+        entity.employedItemsCount = request.employedItemsCount();
+        entity.basePointInTime = LocalDate.parse(request.basePointInTime());
+        entity.baseIndex = request.baseIndex();
+        entity.favorite = request.favorite();
+        entity.sourceType = SourceType.USER;
+        entity.enabled = false;
+        return entity;
+    }
+
     public static IndexInformation createWithOpenApi(
             String indexClassification,
             String indexName,
@@ -52,6 +67,18 @@ public class IndexInformation {
                 false,
                 false
         );
+    }
+
+    public void updateWithUser(
+            Integer employedItemsCount,
+            String basePointInTime,
+            Float baseIndex,
+            Boolean favorite
+    ) {
+        this.employedItemsCount = employedItemsCount;
+        this.basePointInTime = LocalDate.parse(basePointInTime);
+        this.baseIndex = baseIndex;
+        this.favorite = favorite;
     }
 
     public void updateWithOpenApi(
