@@ -5,7 +5,7 @@ public record IndexInformationCreateRequest(
         String indexClassification,
         Integer employedItemsCount,
         String basePointInTime,
-        Number baseIndex,
+        Float baseIndex,
         Boolean favorite
 ) {
 

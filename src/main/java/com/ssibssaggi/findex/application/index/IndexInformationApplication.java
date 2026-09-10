@@ -1,4 +1,4 @@
-package com.ssibssaggi.findex.application;
+package com.ssibssaggi.findex.application.index;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import com.ssibssaggi.findex.controller.dto.IndexInformationResponse;
 import com.ssibssaggi.findex.controller.dto.IndexInformationSummaryResponse;
 import com.ssibssaggi.findex.controller.dto.IndexInformationUpdateRequest;
 import com.ssibssaggi.findex.domain.entity.index.IndexInformation;
-import com.ssibssaggi.findex.domain.service.IndexInformationService;
+import com.ssibssaggi.findex.domain.service.index.IndexInformationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,7 +23,7 @@ public class IndexInformationApplication {
     private final IndexInformationService indexInformationService;
 
     public IndexInformationResponse saveInformation(IndexInformationCreateRequest indexInformationCreateRequest) {
-        IndexInformation savedEntity = indexInformationService.save(indexInformationCreateRequest);
+        IndexInformation savedEntity = indexInformationService.createInformation(indexInformationCreateRequest);
 
         return IndexInformationResponse.of(savedEntity);
     }
@@ -41,18 +41,12 @@ public class IndexInformationApplication {
         indexInformationService.delete(id);
     }
 
-    /**
-     * Transactional 사용이유 - Transactional을사용하지않았을때 Dirty Checking가 되지않아 명시적 save를 진행해야함 사용하면 필드를 변경하면 Dirty Checking를 통해
-     * 변경 감지하여 작업이 종료됨과 동시에 flush + commit을 진행해해주기 때문에 Transactional를사용함
-     */
-
     @Transactional
     public IndexInformationResponse update(
             Long id,
             IndexInformationUpdateRequest indexInformationUpdateRequest
     ) {
         IndexInformation entity = indexInformationService.update(id, indexInformationUpdateRequest);
-
         return IndexInformationResponse.of(entity);
     }
 

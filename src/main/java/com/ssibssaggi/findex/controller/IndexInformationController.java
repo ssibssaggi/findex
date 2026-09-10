@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssibssaggi.findex.application.IndexInformationApplication;
+import com.ssibssaggi.findex.application.index.IndexInformationApplication;
 import com.ssibssaggi.findex.common.dto.PageResponse;
 import com.ssibssaggi.findex.controller.dto.CursorPageCondition;
 import com.ssibssaggi.findex.controller.dto.IndexInfoSearchCondition;

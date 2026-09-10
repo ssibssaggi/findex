@@ -13,3 +13,4 @@ public interface IndexInformationRepository
     // SELECT * FROM index_information WHERE index_classification = ? AND index_name = ?;
     Optional<IndexInformation> findByIndexClassificationAndIndexName(String indexClassification, String indexName);
 }
+
