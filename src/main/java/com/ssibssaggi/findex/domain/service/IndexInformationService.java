@@ -4,13 +4,14 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.ssibssaggi.findex.common.dto.PageResponse;
 import com.ssibssaggi.findex.common.exception.CustomException;
+import com.ssibssaggi.findex.controller.dto.CursorPageCondition;
+import com.ssibssaggi.findex.controller.dto.IndexInfoSearchCondition;
 import com.ssibssaggi.findex.controller.dto.IndexInformationCreateRequest;
 import com.ssibssaggi.findex.controller.dto.IndexInformationUpdateRequest;
 import com.ssibssaggi.findex.domain.entity.index.IndexInformation;
-import com.ssibssaggi.findex.domain.entity.index.SourceType;
 import com.ssibssaggi.findex.repository.IndexInformationRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class IndexInformationService {
     private final IndexInformationRepository indexInformationRepository;
 
-    public IndexInformation save(IndexInformationCreateRequest request, SourceType sourceType) {
+    public IndexInformation save(IndexInformationCreateRequest request) {
         boolean isDuplicate = this.validateByIndexClassificationAndIndexName(request.indexClassification(),
                 request.indexName());
 
@@ -28,7 +29,7 @@ public class IndexInformationService {
             throw new CustomException("잘못된 요청입니다.", HttpStatus.BAD_REQUEST, "동일한 지수 분류와 지수명이 이미 등록되어 있습니다.");
         }
 
-        IndexInformation entity = IndexInformation.create(request, sourceType);
+        IndexInformation entity = IndexInformation.createWithUser(request);
         return indexInformationRepository.save(entity);
     }
 
@@ -53,11 +54,6 @@ public class IndexInformationService {
         indexInformationRepository.delete(entity);
     }
 
-    /**
-     * Transactional 사용이유 - Transactional을사용하지않았을때 Dirty Checking가 되지않아 명시적 save를 진행해야함 사용하면 필드를 변경하면 Dirty Checking를 통해
-     * 변경 감지하여 작업이 종료됨과 동시에 flush + commit을 진행해해주기 때문에 Transactional를사용함
-     */
-    @Transactional
     public IndexInformation update(
             Long id,
             IndexInformationUpdateRequest indexInformationUpdateRequest
@@ -77,7 +73,30 @@ public class IndexInformationService {
         return entity;
     }
 
-    public List<IndexInformation> findAll() {
+    public List<IndexInformation> findSummary() {
         return indexInformationRepository.findAll();
+    }
+
+    public PageResponse<IndexInformation> searchIndexInfos(
+            IndexInfoSearchCondition indexInfoSearchCondition,
+            CursorPageCondition cursorPageCondition
+    ) {
+        List<IndexInformation> entities = indexInformationRepository.searchIndexInfos(indexInfoSearchCondition,
+                cursorPageCondition);
+        Long totalElements = indexInformationRepository.count(indexInfoSearchCondition);
+
+        Long nextIdAfter = null;
+        String nextCursor = null;
+        Boolean hashNext = entities.size() > cursorPageCondition.size();
+
+        List<IndexInformation> content = entities.subList(0, Math.min(entities.size(), cursorPageCondition.size()));
+
+        if (!entities.isEmpty()) {
+            IndexInformation lastEntity = entities.get(entities.size() - 2);
+            nextIdAfter = lastEntity.getId();
+            nextCursor = lastEntity.getIndexClassification();
+        }
+
+        return PageResponse.of(content, nextCursor, nextIdAfter, totalElements, cursorPageCondition.size(), hashNext);
     }
 }

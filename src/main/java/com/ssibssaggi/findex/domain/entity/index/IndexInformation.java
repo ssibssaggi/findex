@@ -38,7 +38,7 @@ public class IndexInformation {
         this.favorite = favorite;
     }
 
-    public static IndexInformation create(IndexInformationCreateRequest request, SourceType sourceType) {
+    public static IndexInformation createWithUser(IndexInformationCreateRequest request) {
         IndexInformation entity = new IndexInformation();
         entity.indexName = request.indexName();
         entity.indexClassification = request.indexClassification();
@@ -46,8 +46,8 @@ public class IndexInformation {
         entity.basePointInTime = LocalDate.parse(request.basePointInTime());
         entity.baseIndex = request.baseIndex().intValue();
         entity.favorite = request.favorite();
-        entity.sourceType = sourceType;
-        entity.enabled = true;
+        entity.sourceType = SourceType.USER;
+        entity.enabled = false;
         return entity;
     }
 }
