@@ -8,7 +8,7 @@ import lombok.Builder;
 @Builder
 public record PageResponse<T>(
         List<T> content,
-        String nestCursor,
+        String nextCursor,
         Long nextIdAfter,
         Integer size,
         Long totalElements,
@@ -22,7 +22,7 @@ public record PageResponse<T>(
 
         return new PageResponse<>(
                 mappedContent,
-                this.nestCursor,
+                this.nextCursor,
                 this.nextIdAfter,
                 this.size,
                 this.totalElements,
@@ -40,7 +40,7 @@ public record PageResponse<T>(
     ) {
         return PageResponse.<T>builder()
                 .content(content)
-                .nestCursor(nestCursor)
+                .nextCursor(nestCursor)
                 .nextIdAfter(nextIdAfter)
                 .size(size)
                 .totalElements(totalElements)
