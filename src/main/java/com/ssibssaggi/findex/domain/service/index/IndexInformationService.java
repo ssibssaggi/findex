@@ -135,9 +135,9 @@ public class IndexInformationService {
         Boolean hashNext = entities.size() > cursorPageCondition.size();
 
         List<IndexInformation> content = entities.subList(0, Math.min(entities.size(), cursorPageCondition.size()));
-
+        
         if (!entities.isEmpty()) {
-            IndexInformation lastEntity = entities.get(content.size() - 1);
+            IndexInformation lastEntity = content.get(content.size() - 1);
             nextIdAfter = lastEntity.getId();
             nextCursor = this.getLastSortValue(cursorPageCondition.sortField(), lastEntity);
         }
