@@ -139,9 +139,21 @@ public class IndexInformationService {
         if (!entities.isEmpty()) {
             IndexInformation lastEntity = entities.get(content.size() - 1);
             nextIdAfter = lastEntity.getId();
-            nextCursor = lastEntity.getIndexClassification();
+            nextCursor = this.getLastSortValue(cursorPageCondition.sortField(), lastEntity);
         }
 
         return PageResponse.of(content, nextCursor, nextIdAfter, totalElements, cursorPageCondition.size(), hashNext);
+    }
+
+    private String getLastSortValue(
+            String sortField,
+            IndexInformation indexInformation
+    ) {
+        return switch (sortField) {
+            case "indexClassification" -> indexInformation.getIndexClassification();
+            case "indexName" -> indexInformation.getIndexName();
+            case "employedItemsCount" -> indexInformation.getEmployedItemsCount().toString();
+            default -> null;
+        };
     }
 }
