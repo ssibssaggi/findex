@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ssibssaggi.findex.client.openapi.IndexDataSyncWithApiCommand;
+import com.ssibssaggi.findex.client.openapi.IndexDataFetchQuery;
 import com.ssibssaggi.findex.client.openapi.IndexOpenApiClient;
 import com.ssibssaggi.findex.controller.dto.SyncJobDto;
 import com.ssibssaggi.findex.domain.entity.index.IndexInformation;
@@ -42,16 +42,17 @@ public class IndexIntegrationApplication {
     @Transactional
     public List<SyncJobDto> syncIndexDataWithOpenApi(String worker, SyncIndexDataCommand command) {
         List<IndexInformation> indexInformations = indexInformationService.findAllByIds(command.indexInfosIds());
+        List<IndexDataFetchQuery> indexDataFetchQueries = indexInformations.stream()
+                .map(eachIndexInfo -> IndexDataFetchQuery.of(
+                        eachIndexInfo,
+                        command.baseDateFrom(),
+                        command.baseDateTo()
+                ))
+                .toList();
 
-        List<InsertIndexDataCommand> insertIndexDataCommands = indexInformations.stream()
-                .flatMap(indexInformation -> indexOpenApiClient.syncIndexData(
-                                IndexDataSyncWithApiCommand.of(
-                                        indexInformation.getIndexName(),
-                                        command.baseDateFrom(),
-                                        command.baseDateTo()
-                                )
-                        ).stream()
-                        .map(item -> InsertIndexDataCommand.from(item, indexInformation)))
+        List<InsertIndexDataCommand> insertIndexDataCommands = indexDataFetchQueries.stream()
+                .flatMap(query -> indexOpenApiClient.syncIndexData(query).stream())
+                .map(InsertIndexDataCommand::from)
                 .toList();
 
         List<InsertIntegrationHistoryCommand> insertIntegrationHistoryCommands = indexDataService

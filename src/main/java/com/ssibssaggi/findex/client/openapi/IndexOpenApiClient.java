@@ -12,6 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import com.ssibssaggi.findex.client.openapi.dto.indexdata.IndexDataFetchResult;
+import com.ssibssaggi.findex.client.openapi.dto.indexdata.IndexDataOpenApiResponse;
+import com.ssibssaggi.findex.client.openapi.dto.indexinfo.IndexInfoFetchResult;
+import com.ssibssaggi.findex.client.openapi.dto.indexinfo.IndexInfoOpenApiResponse;
 import com.ssibssaggi.findex.common.exception.CustomException;
 
 import lombok.RequiredArgsConstructor;
@@ -24,8 +28,8 @@ public class IndexOpenApiClient {
     @Value("${index-api.service-key}")
     private String serviceKey;
 
-    public List<IndexInfoApiItem> syncIndexInformation() {
-        IndexInfoApiResponse response = Optional.ofNullable(indexRestClient.get()
+    public List<IndexInfoFetchResult> syncIndexInformation() {
+        IndexInfoOpenApiResponse response = Optional.ofNullable(indexRestClient.get()
                         .uri(uriBuilder -> uriBuilder
                                 .queryParam("serviceKey", "{serviceKey}")
                                 .queryParam("resultType", "json")
@@ -39,7 +43,7 @@ public class IndexOpenApiClient {
                         )
                         .accept(MediaType.APPLICATION_JSON)
                         .retrieve()
-                        .body(IndexInfoApiResponse.class))
+                        .body(IndexInfoOpenApiResponse.class))
                 .orElseThrow(() -> new CustomException(
                         "OpenAPI 호출 오류",
                         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -53,8 +57,8 @@ public class IndexOpenApiClient {
         return date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
     }
 
-    public List<IndexDataApiItem> syncIndexData(IndexDataSyncWithApiCommand command) {
-        return Optional.ofNullable(indexRestClient.get()
+    public List<IndexDataFetchResult> syncIndexData(IndexDataFetchQuery command) {
+        IndexDataOpenApiResponse response = Optional.ofNullable(indexRestClient.get()
                         .uri(uriBuilder -> uriBuilder
                                 .queryParam("serviceKey", "{serviceKey}")
                                 .queryParam("resultType", "json")
@@ -72,13 +76,16 @@ public class IndexOpenApiClient {
                         )
                         .accept(MediaType.APPLICATION_JSON)
                         .retrieve()
-                        .body(IndexDataApiResponse.class)
+                        .body(IndexDataOpenApiResponse.class)
                 )
                 .orElseThrow(() -> new CustomException(
                         "OpenAPI 호출 오류",
                         HttpStatus.INTERNAL_SERVER_ERROR,
                         "OpenAPI 가 정상적으로 호출되지 않습니다."
-                ))
-                .toIndexDataApiItems();
+                ));
+
+        return response.items().stream()
+                .map(indexData -> IndexDataFetchResult.from(command.indexInformation(), indexData))
+                .toList();
     }
 }

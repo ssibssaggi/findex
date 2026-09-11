@@ -20,22 +20,19 @@ public record InsertIndexDataCommand(
         Long tradingPrice,
         Long marketTotalAmount
 ) {
-    public static InsertIndexDataCommand from(
-            IndexDataFetchResult indexDataApiItem,
-            IndexInformation indexInformation
-    ) {
+    public static InsertIndexDataCommand from(IndexDataFetchResult fetchResult) {
         return new InsertIndexDataCommand(
-                indexInformation,
-                indexDataApiItem.baseDate(),
-                indexDataApiItem.marketPrice(),
-                indexDataApiItem.closingPrice(),
-                indexDataApiItem.highPrice(),
-                indexDataApiItem.lowPrice(),
-                indexDataApiItem.versus(),
-                indexDataApiItem.fluctuationRate(),
-                indexDataApiItem.tradingQuantity(),
-                indexDataApiItem.tradingPrice(),
-                indexDataApiItem.marketTotalAmount()
+                fetchResult.indexInformation(),
+                fetchResult.baseDate(),
+                fetchResult.marketPrice(),
+                fetchResult.closingPrice(),
+                fetchResult.highPrice(),
+                fetchResult.lowPrice(),
+                fetchResult.versus(),
+                fetchResult.fluctuationRate(),
+                fetchResult.tradingQuantity(),
+                fetchResult.tradingPrice(),
+                fetchResult.marketTotalAmount()
         );
     }
 

@@ -3,30 +3,37 @@ package com.ssibssaggi.findex.client.openapi.dto.indexdata;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ssibssaggi.findex.domain.entity.index.IndexInformation;
 
 public record IndexDataFetchResult(
-        @JsonProperty("basDt")
-        @JsonFormat(pattern = "yyyyMMdd")
+        IndexInformation indexInformation,
         LocalDate baseDate,
-        @JsonProperty("mkp")
         BigDecimal marketPrice,
-        @JsonProperty("clpr")
         BigDecimal closingPrice,
-        @JsonProperty("hipr")
         BigDecimal highPrice,
-        @JsonProperty("lopr")
         BigDecimal lowPrice,
-        @JsonProperty("vs")
         BigDecimal versus,
-        @JsonProperty("fltRt")
         BigDecimal fluctuationRate,
-        @JsonProperty("trqu")
         Long tradingQuantity,
-        @JsonProperty("trPrc")
         Long tradingPrice,
-        @JsonProperty("lstgMrktTotAmt")
         Long marketTotalAmount
 ) {
+    public static IndexDataFetchResult from(
+            IndexInformation indexInformation,
+            IndexDataOpenApiItem indexData
+    ) {
+        return new IndexDataFetchResult(
+                indexInformation,
+                indexData.baseDate(),
+                indexData.marketPrice(),
+                indexData.closingPrice(),
+                indexData.highPrice(),
+                indexData.lowPrice(),
+                indexData.versus(),
+                indexData.fluctuationRate(),
+                indexData.tradingQuantity(),
+                indexData.tradingPrice(),
+                indexData.marketTotalAmount()
+        );
+    }
 }

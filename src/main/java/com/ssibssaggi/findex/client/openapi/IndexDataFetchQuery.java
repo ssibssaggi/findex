@@ -2,19 +2,25 @@ package com.ssibssaggi.findex.client.openapi;
 
 import java.time.LocalDate;
 
+import com.ssibssaggi.findex.domain.entity.index.IndexInformation;
+
 public record IndexDataFetchQuery(
-        String indexName,
+        IndexInformation indexInformation,
         LocalDate baseDateFrom,
         LocalDate baseDateTo
 ) {
     public static IndexDataFetchQuery of(
-            String indexName,
+            IndexInformation indexInformation,
             LocalDate baseDateFrom,
             LocalDate baseDateTo) {
         return new IndexDataFetchQuery(
-                indexName,
+                indexInformation,
                 baseDateFrom,
                 baseDateTo
         );
+    }
+
+    public String indexName() {
+        return indexInformation.getIndexName();
     }
 }

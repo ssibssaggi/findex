@@ -10,10 +10,10 @@ public record IndexDataOpenApiResponse(Response response) {
     public record Body(Items items) {
     }
 
-    public record Items(List<IndexDataFetchResult> item) {
+    public record Items(List<IndexDataOpenApiItem> item) {
     }
 
-    public List<IndexDataFetchResult> toIndexDataApiItems() {
+    public List<IndexDataOpenApiItem> items() {
         return response().body().items().item();
     }
 }
