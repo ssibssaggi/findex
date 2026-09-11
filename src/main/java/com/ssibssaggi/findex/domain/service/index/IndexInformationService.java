@@ -137,7 +137,7 @@ public class IndexInformationService {
         List<IndexInformation> content = entities.subList(0, Math.min(entities.size(), cursorPageCondition.size()));
 
         if (!entities.isEmpty()) {
-            IndexInformation lastEntity = entities.get(content.size() - 2);
+            IndexInformation lastEntity = entities.get(content.size() - 1);
             nextIdAfter = lastEntity.getId();
             nextCursor = lastEntity.getIndexClassification();
         }
