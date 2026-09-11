@@ -1,5 +1,6 @@
 package com.ssibssaggi.findex.domain.entity.index;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
@@ -21,15 +22,15 @@ public class IndexData {
     private Long id;
     private LocalDate baseDate;
     private SourceType sourceType;
-    private Float marketPrice;
-    private Float closingPrice;
-    private Float highPrice;
-    private Float lowPrice;
-    private Float versus;
-    private Float fluctuationRate;
-    private Integer tradingQuantity;
-    private Integer tradingPrice;
-    private Integer marketTotalAmount;
+    private BigDecimal marketPrice;
+    private BigDecimal closingPrice;
+    private BigDecimal highPrice;
+    private BigDecimal lowPrice;
+    private BigDecimal versus;
+    private BigDecimal fluctuationRate;
+    private Long tradingQuantity;
+    private Long tradingPrice;
+    private Long marketTotalAmount;
 
     @ManyToOne
     @JoinColumn(name = "index_information_id")

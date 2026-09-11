@@ -1,18 +1,19 @@
 package com.ssibssaggi.findex.controller.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record IndexDataExportResponse(
         LocalDate baseDate,
-        Float marketPrice,
-        Float closingPrice,
-        Float highPrice,
-        Float lowPrice,
-        Float versus,
-        Float fluctuationRate,
-        Integer tradingQuantity,
-        Integer tradingPrice,
-        Integer marketTotalAmount
+        BigDecimal marketPrice,
+        BigDecimal closingPrice,
+        BigDecimal highPrice,
+        BigDecimal lowPrice,
+        BigDecimal versus,
+        BigDecimal fluctuationRate,
+        Long tradingQuantity,
+        Long tradingPrice,
+        Long marketTotalAmount
 ) {
 
 }
