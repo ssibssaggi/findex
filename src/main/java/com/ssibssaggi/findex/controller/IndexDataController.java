@@ -1,6 +1,6 @@
-package com.ssibssaggi.findex.controller;
+/*package com.ssibssaggi.findex.controller;
 
-import com.ssibssaggi.findex.controller.dto.DataCreateRequest;
+import com.ssibssaggi.findex.controller.dto.IndexDataCreateRequest;
 import com.ssibssaggi.findex.controller.dto.IndexDataResponse;
 import com.ssibssaggi.findex.domain.entity.index.IndexData;
 import com.ssibssaggi.findex.service.IndexDataService;
@@ -25,20 +25,19 @@ public class IndexDataController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping()
-    public IndexDataResponse createIndexData (@RequestBody @Valid DataCreateRequest createRequest) {
+    public IndexDataResponse createIndexData (@RequestBody @Valid IndexDataCreateRequest createRequest) {
         IndexData indexData = indexDataService.userCreate(createRequest);
         IndexDataResponse response = IndexDataResponse.from(indexData);
-        log.info("지수 데이터 등: " + response);
+        log.info("지수 데이터 등록: " + response);
         return response;
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public IndexDataResponse deleteIndexData(@PathVariable Long id) {
+    public void deleteIndexData(@PathVariable Long id) {
         IndexData indexData = indexDataService.read(id);
         IndexDataResponse response = IndexDataResponse.from(indexData);
         indexDataService.delete(id);
         log.info("삭제한 지수 데이터 id : " + id);
-        return response;
     }
-}
+}*/
