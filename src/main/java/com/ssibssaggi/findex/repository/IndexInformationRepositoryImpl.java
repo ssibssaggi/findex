@@ -7,8 +7,8 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.ssibssaggi.findex.controller.dto.CursorPageCondition;
-import com.ssibssaggi.findex.controller.dto.IndexInfoSearchCondition;
+import com.ssibssaggi.findex.controller.dto.CursorPaginationCondition;
+import com.ssibssaggi.findex.controller.dto.IndexInfoFilterCondition;
 import com.ssibssaggi.findex.domain.entity.index.IndexInformation;
 import com.ssibssaggi.findex.domain.entity.index.QIndexInformation;
 
@@ -20,8 +20,8 @@ public class IndexInformationRepositoryImpl implements IndexInformationRepositor
 
     @Override
     public List<IndexInformation> searchIndexInfos(
-            IndexInfoSearchCondition indexInfoSearchCondition,
-            CursorPageCondition cursorPageCondition
+            IndexInfoFilterCondition indexInfoFilterCondition,
+            CursorPaginationCondition cursorPaginationCondition
     ) {
         QIndexInformation indexInformation = QIndexInformation.indexInformation;
 
@@ -29,16 +29,17 @@ public class IndexInformationRepositoryImpl implements IndexInformationRepositor
                 .select(indexInformation)
                 .from(indexInformation)
                 .where(
-                        indexClassificationContains(indexInfoSearchCondition.indexClassification()),
-                        indexNameContains(indexInfoSearchCondition.indexName()),
-                        favoriteEquals(indexInfoSearchCondition.favorite()),
-                        cursorCondition(cursorPageCondition.idAfter(),
-                                cursorPageCondition.cursor(),
-                                cursorPageCondition.sortField(),
-                                cursorPageCondition.sortDirection())
+                        indexClassificationContains(indexInfoFilterCondition.indexClassification()),
+                        indexNameContains(indexInfoFilterCondition.indexName()),
+                        favoriteEquals(indexInfoFilterCondition.favorite()),
+                        cursorCondition(cursorPaginationCondition.idAfter(),
+                                cursorPaginationCondition.cursor(),
+                                cursorPaginationCondition.sortField(),
+                                cursorPaginationCondition.sortDirection())
                 )
-                .orderBy(createOrderSpecifiers(cursorPageCondition.sortField(), cursorPageCondition.sortDirection()))
-                .limit(cursorPageCondition.size() + 1)
+                .orderBy(createOrderSpecifiers(cursorPaginationCondition.sortField(),
+                        cursorPaginationCondition.sortDirection()))
+                .limit(cursorPaginationCondition.size() + 1)
                 .fetch();
     }
 
@@ -82,7 +83,7 @@ public class IndexInformationRepositoryImpl implements IndexInformationRepositor
     }
 
     @Override
-    public Long count(IndexInfoSearchCondition searchCondition) {
+    public Long count(IndexInfoFilterCondition searchCondition) {
         QIndexInformation indexInformation = QIndexInformation.indexInformation;
 
         return jpaQueryFactory
