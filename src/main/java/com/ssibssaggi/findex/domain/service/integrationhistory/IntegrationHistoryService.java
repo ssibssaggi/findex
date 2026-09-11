@@ -15,13 +15,25 @@ import lombok.RequiredArgsConstructor;
 public class IntegrationHistoryService {
     private final IntegrationHistoryRepository integrationHistoryRepository;
 
-    public List<IntegrationHistory> insert(List<InsertIntegrationHistoryCommand> commands) {
+    public List<IntegrationHistory> insertIndexInformationHistory(List<InsertIntegrationHistoryCommand> commands) {
         List<IntegrationHistory> creating = commands.stream()
                 .map(command -> IntegrationHistory.createIndexInformationHistory(
                         command.worker(),
                         command.indexInformation()
                 ))
                 .toList();
+        return integrationHistoryRepository.saveAll(creating);
+    }
+
+    public List<IntegrationHistory> insertIndexDataHistory(List<InsertIntegrationHistoryCommand> commands) {
+        List<IntegrationHistory> creating = commands.stream()
+                .map(command -> IntegrationHistory.createIndexDataHistory(
+                        command.worker(),
+                        command.targetDate(),
+                        command.indexInformation()
+                ))
+                .toList();
+
         return integrationHistoryRepository.saveAll(creating);
     }
 }
