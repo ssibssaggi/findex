@@ -50,17 +50,19 @@ public class IndexIntegrationApplication {
                 ))
                 .toList();
 
-        List<InsertIndexDataCommand> insertIndexDataCommands = indexDataFetchQueries.stream()
-                .flatMap(query -> indexOpenApiClient.syncIndexData(query).stream())
+        List<InsertIndexDataCommand> insertIndexDataCommands = indexOpenApiClient.syncIndexData(indexDataFetchQueries)
+                .stream()
                 .map(InsertIndexDataCommand::from)
                 .toList();
 
         List<InsertIntegrationHistoryCommand> insertIntegrationHistoryCommands = indexDataService
-                .insertIndexData(insertIndexDataCommands).stream()
+                .insertIndexData(insertIndexDataCommands)
+                .stream()
                 .map(indexData -> InsertIntegrationHistoryCommand.of(
                         worker,
                         indexData.getBaseDate(),
-                        indexData.getIndexInformation()))
+                        indexData.getIndexInformation()
+                ))
                 .toList();
 
         List<IntegrationHistory> integrationHistories = integrationHistoryService.insertIndexDataHistory(

@@ -57,7 +57,13 @@ public class IndexOpenApiClient {
         return date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
     }
 
-    public List<IndexDataFetchResult> syncIndexData(IndexDataFetchQuery command) {
+    public List<IndexDataFetchResult> syncIndexData(List<IndexDataFetchQuery> queries) {
+        return queries.stream()
+                .flatMap(query -> syncIndexData(query).stream())
+                .toList();
+    }
+
+    private List<IndexDataFetchResult> syncIndexData(IndexDataFetchQuery query) {
         IndexDataOpenApiResponse response = Optional.ofNullable(indexRestClient.get()
                         .uri(uriBuilder -> uriBuilder
                                 .queryParam("serviceKey", "{serviceKey}")
@@ -68,10 +74,10 @@ public class IndexOpenApiClient {
                                 .queryParam("beginBasDt", "{baseDateFrom}")
                                 .queryParam("endBasDt", "{baseDateTo}")
                                 .build(serviceKey,
-                                        command.indexName(),
-                                        localDateToYyyyMmDd(command.baseDateFrom()),
+                                        query.indexName(),
+                                        localDateToYyyyMmDd(query.baseDateFrom()),
                                         // API에 endBasDt 이전 날짜만 응답에 포함하므로 1일을 더함.
-                                        localDateToYyyyMmDd(command.baseDateTo().plusDays(1))
+                                        localDateToYyyyMmDd(query.baseDateTo().plusDays(1))
                                 )
                         )
                         .accept(MediaType.APPLICATION_JSON)
@@ -85,7 +91,8 @@ public class IndexOpenApiClient {
                 ));
 
         return response.items().stream()
-                .map(indexData -> IndexDataFetchResult.from(command.indexInformation(), indexData))
+                .map(indexData -> IndexDataFetchResult.from(query.indexInformation(), indexData))
                 .toList();
     }
+
 }
