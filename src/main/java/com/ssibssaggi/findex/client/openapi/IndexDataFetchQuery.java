@@ -2,16 +2,16 @@ package com.ssibssaggi.findex.client.openapi;
 
 import java.time.LocalDate;
 
-public record IndexDataSyncWithApiCommand(
+public record IndexDataFetchQuery(
         String indexName,
         LocalDate baseDateFrom,
         LocalDate baseDateTo
 ) {
-    public static IndexDataSyncWithApiCommand of(
+    public static IndexDataFetchQuery of(
             String indexName,
             LocalDate baseDateFrom,
             LocalDate baseDateTo) {
-        return new IndexDataSyncWithApiCommand(
+        return new IndexDataFetchQuery(
                 indexName,
                 baseDateFrom,
                 baseDateTo

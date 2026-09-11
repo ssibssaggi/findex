@@ -3,7 +3,7 @@ package com.ssibssaggi.findex.application.indexintegration;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.ssibssaggi.findex.client.openapi.IndexDataApiItem;
+import com.ssibssaggi.findex.client.openapi.dto.indexdata.IndexDataFetchResult;
 import com.ssibssaggi.findex.domain.entity.index.IndexData;
 import com.ssibssaggi.findex.domain.entity.index.IndexInformation;
 
@@ -21,7 +21,7 @@ public record InsertIndexDataCommand(
         Long marketTotalAmount
 ) {
     public static InsertIndexDataCommand from(
-            IndexDataApiItem indexDataApiItem,
+            IndexDataFetchResult indexDataApiItem,
             IndexInformation indexInformation
     ) {
         return new InsertIndexDataCommand(
