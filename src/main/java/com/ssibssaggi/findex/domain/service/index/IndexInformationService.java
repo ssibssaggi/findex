@@ -144,4 +144,8 @@ public class IndexInformationService {
 
         return PageResponse.of(content, nextCursor, nextIdAfter, totalElements, cursorPageCondition.size(), hashNext);
     }
+
+    public List<IndexInformation> findAllByIds(List<Long> ids) {
+        return indexInformationRepository.findAllById(ids);
+    }
 }
