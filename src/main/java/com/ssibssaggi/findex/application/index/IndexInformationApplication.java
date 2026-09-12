@@ -5,13 +5,13 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ssibssaggi.findex.common.dto.PageResponse;
-import com.ssibssaggi.findex.controller.dto.CursorPageCondition;
-import com.ssibssaggi.findex.controller.dto.IndexInfoSearchCondition;
-import com.ssibssaggi.findex.controller.dto.IndexInformationCreateRequest;
+import com.ssibssaggi.findex.application.index.dto.IndexInfoCreateCommand;
+import com.ssibssaggi.findex.application.index.dto.IndexInfoUpdateCommand;
+import com.ssibssaggi.findex.common.dto.CursorPageResult;
+import com.ssibssaggi.findex.controller.dto.CursorPaginationCondition;
+import com.ssibssaggi.findex.controller.dto.IndexInfoFilterCondition;
 import com.ssibssaggi.findex.controller.dto.IndexInformationResponse;
 import com.ssibssaggi.findex.controller.dto.IndexInformationSummaryResponse;
-import com.ssibssaggi.findex.controller.dto.IndexInformationUpdateRequest;
 import com.ssibssaggi.findex.domain.entity.index.IndexInformation;
 import com.ssibssaggi.findex.domain.service.index.IndexInformationService;
 
@@ -23,8 +23,8 @@ public class IndexInformationApplication {
     private final IndexInformationService indexInformationService;
 
     @Transactional
-    public IndexInformationResponse saveInformation(IndexInformationCreateRequest indexInformationCreateRequest) {
-        IndexInformation savedEntity = indexInformationService.createInformation(indexInformationCreateRequest);
+    public IndexInformationResponse saveInformation(IndexInfoCreateCommand indexInfoCreateCommand) {
+        IndexInformation savedEntity = indexInformationService.createInformation(indexInfoCreateCommand);
 
         return IndexInformationResponse.of(savedEntity);
     }
@@ -45,9 +45,9 @@ public class IndexInformationApplication {
     @Transactional
     public IndexInformationResponse update(
             Long id,
-            IndexInformationUpdateRequest indexInformationUpdateRequest
+            IndexInfoUpdateCommand indexInfoUpdateCommand
     ) {
-        IndexInformation entity = indexInformationService.update(id, indexInformationUpdateRequest);
+        IndexInformation entity = indexInformationService.update(id, indexInfoUpdateCommand);
         return IndexInformationResponse.of(entity);
     }
 
@@ -57,14 +57,14 @@ public class IndexInformationApplication {
                 .toList();
     }
 
-    public PageResponse<IndexInformationResponse> searchIndexInfos(
-            IndexInfoSearchCondition indexInfoSearchCondition,
-            CursorPageCondition cursorPageCondition
+    public CursorPageResult<IndexInformationResponse> searchIndexInfos(
+            IndexInfoFilterCondition indexInfoFilterCondition,
+            CursorPaginationCondition cursorPaginationCondition
     ) {
 
-        PageResponse<IndexInformation> pageEntities = indexInformationService.searchIndexInfos(
-                indexInfoSearchCondition,
-                cursorPageCondition
+        CursorPageResult<IndexInformation> pageEntities = indexInformationService.searchIndexInfos(
+                indexInfoFilterCondition,
+                cursorPaginationCondition
         );
 
         return pageEntities.map(IndexInformationResponse::of);
