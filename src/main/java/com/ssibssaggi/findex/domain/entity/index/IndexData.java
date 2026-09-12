@@ -2,18 +2,16 @@ package com.ssibssaggi.findex.domain.entity.index;
 
 import com.ssibssaggi.findex.controller.dto.IndexDataCreateRequest;
 import com.ssibssaggi.findex.controller.dto.IndexDataUpdateRequest;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,10 +21,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"index_information", "base_date"})
-})
+@Table(
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"index_information_id", "base_date"})
+    })
 public class IndexData {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -93,7 +93,8 @@ public class IndexData {
         return entity;
     }
 
-    public void update (IndexDataUpdateRequest updateRequest, IndexInformation indexInformation) {
+    public void update(IndexDataUpdateRequest updateRequest, IndexInformation indexInformation,
+        SourceType sourceType) {
         this.baseDate = updateRequest.baseDate();
         this.marketPrice = updateRequest.marketPrice();
         this.closingPrice = updateRequest.closingPrice();
@@ -105,5 +106,6 @@ public class IndexData {
         this.tradingPrice = updateRequest.tradingPrice();
         this.marketTotalAmount = updateRequest.marketTotalAmount();
         this.indexInformation = indexInformation;
+        this.sourceType = sourceType;
     }
 }
