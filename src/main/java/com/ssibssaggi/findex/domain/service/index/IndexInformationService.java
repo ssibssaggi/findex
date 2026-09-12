@@ -167,4 +167,8 @@ public class IndexInformationService {
             default -> null;
         };
     }
+
+    public List<IndexInformation> findAllByIds(List<Long> ids) {
+        return indexInformationRepository.findAllById(ids);
+    }
 }
