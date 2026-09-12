@@ -7,8 +7,8 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.ssibssaggi.findex.controller.dto.CursorPageCondition;
-import com.ssibssaggi.findex.controller.dto.IndexInfoSearchCondition;
+import com.ssibssaggi.findex.controller.dto.CursorPaginationCondition;
+import com.ssibssaggi.findex.controller.dto.IndexInfoFilterCondition;
 import com.ssibssaggi.findex.domain.entity.index.IndexInformation;
 import com.ssibssaggi.findex.domain.entity.index.QIndexInformation;
 
@@ -20,8 +20,8 @@ public class IndexInformationRepositoryImpl implements IndexInformationRepositor
 
     @Override
     public List<IndexInformation> searchIndexInfos(
-            IndexInfoSearchCondition indexInfoSearchCondition,
-            CursorPageCondition cursorPageCondition
+            IndexInfoFilterCondition indexInfoFilterCondition,
+            CursorPaginationCondition cursorPaginationCondition
     ) {
         QIndexInformation indexInformation = QIndexInformation.indexInformation;
 
@@ -29,17 +29,61 @@ public class IndexInformationRepositoryImpl implements IndexInformationRepositor
                 .select(indexInformation)
                 .from(indexInformation)
                 .where(
-                        indexClassificationContains(indexInfoSearchCondition.indexClassification()),
-                        indexNameContains(indexInfoSearchCondition.indexName()),
-                        favoriteEquals(indexInfoSearchCondition.favorite())
+                        indexClassificationContains(indexInfoFilterCondition.indexClassification()),
+                        indexNameContains(indexInfoFilterCondition.indexName()),
+                        favoriteEquals(indexInfoFilterCondition.favorite()),
+                        cursorCondition(cursorPaginationCondition.idAfter(),
+                                cursorPaginationCondition.cursor(),
+                                cursorPaginationCondition.sortField(),
+                                cursorPaginationCondition.sortDirection())
                 )
-                .orderBy(createOrderSpecifier(cursorPageCondition.sortField(), cursorPageCondition.sortDirection()))
-                .limit(cursorPageCondition.size() + 1)
+                .orderBy(createOrderSpecifiers(cursorPaginationCondition.sortField(),
+                        cursorPaginationCondition.sortDirection()))
+                .limit(cursorPaginationCondition.size() + 1)
                 .fetch();
     }
 
+    private BooleanExpression cursorCondition(
+            Long lastId,
+            String lastSortValue,
+            String sortField,
+            String sortDirection
+    ) {
+        if (lastSortValue == null) {
+            return null;
+        }
+
+        QIndexInformation indexInformation = QIndexInformation.indexInformation;
+
+        boolean isDesc = "DESC".equalsIgnoreCase(sortDirection);
+
+        return switch (sortField) {
+            case "indexClassification" -> isDesc ? indexInformation.indexClassification.lt(lastSortValue)
+                    .or(indexInformation.indexClassification.eq(lastSortValue).and(indexInformation.id.lt(lastId)))
+                    : indexInformation.indexClassification.gt(lastSortValue)
+                            .or(indexInformation.indexClassification.eq(lastSortValue)
+                                    .and(indexInformation.id.gt(lastId)));
+            case "indexName" -> isDesc ? indexInformation.indexName.lt(lastSortValue)
+                    .or(indexInformation.indexName.eq(lastSortValue)
+                            .and(indexInformation.id.lt(lastId)))
+                    : indexInformation.indexName.gt(lastSortValue)
+                            .or(indexInformation.indexName.eq(lastSortValue)
+                                    .and(indexInformation.id.gt(lastId)));
+            case "employedItemsCount" -> {
+                Integer employedItemsCount = Integer.parseInt(lastSortValue);
+                yield isDesc ? indexInformation.employedItemsCount.lt(employedItemsCount)
+                        .or(indexInformation.employedItemsCount.eq(employedItemsCount)
+                                .and(indexInformation.id.lt(lastId)))
+                        : indexInformation.employedItemsCount.gt(employedItemsCount)
+                                .or(indexInformation.employedItemsCount.eq(employedItemsCount)
+                                        .and(indexInformation.id.gt(lastId)));
+            }
+            default -> isDesc ? indexInformation.id.lt(lastId) : indexInformation.id.gt(lastId);
+        };
+    }
+
     @Override
-    public Long count(IndexInfoSearchCondition searchCondition) {
+    public Long count(IndexInfoFilterCondition searchCondition) {
         QIndexInformation indexInformation = QIndexInformation.indexInformation;
 
         return jpaQueryFactory
@@ -54,14 +98,6 @@ public class IndexInformationRepositoryImpl implements IndexInformationRepositor
     }
 
     // 조건절 (WHERE)
-    // BooleanExpression : Null 이면 자동으로 조건절에서 제외되는 DSL 제공 타입
-    // - value가 null이면 조건 자체를 안 붙임
-    // - contains : LIKE '%value%'
-    // - eq(x) : ? = x
-    // - gt(x) : ? > x
-    // - lt(x) : ? < x
-    // - goe(x) : ? >= x
-    // - loe(x) : ? <= x
     private BooleanExpression indexClassificationContains(String value) {
         return value == null ? null : QIndexInformation.indexInformation.indexClassification.contains(value);
     }
@@ -74,61 +110,25 @@ public class IndexInformationRepositoryImpl implements IndexInformationRepositor
         return value == null ? null : QIndexInformation.indexInformation.favorite.eq(value);
     }
 
-    private BooleanExpression cursorCondition(CursorPageCondition condition) {
-        if (condition.idAfter() == null) {
-            return null;
-        }
-        QIndexInformation q = QIndexInformation.indexInformation;
-        boolean isDesc = "DESC".equalsIgnoreCase(condition.sortDirection());
-        ComparableExpressionBase<?> sortTarget = getSortTarget(condition.sortField());
-        Comparable cursorValue = condition.cursor();
-
-        return null;
-        //        return switch (condition.sortField()) {
-        //            case "indexClassification" -> {
-        //                String cursor = condition.cursor();
-        //                yield isDesc
-        //                        ? q.indexClassification.lt(cursor)
-        //                        .or(q.indexClassification.eq(cursor).and(q.id.lt(conditionidAfter)))
-        //                        : q.indexClassification.gt(cursor).or(q.indexClassification.eq(cursor).and(q.id.gt
-        //                        (idAfter)));
-        //            }
-        //            case "indexName" -> {
-        //                String cursor = condition.cursor();
-        //                yield isDesc
-        //                        ? q.indexName.lt(cursor).or(q.indexName.eq(cursor).and(q.id.lt(idAfter)))
-        //                        : q.indexName.gt(cursor).or(q.indexName.eq(cursor).and(q.id.gt(idAfter)));
-        //            }
-        //            case "employedItemsCount" -> {
-        //                Integer cursor = Integer.valueOf(condition.cursor());
-        //                yield isDesc
-        //                        ? q.employedItemsCount.lt(cursor).or(q.employedItemsCount.eq(cursor).and(q.id.lt
-        //                        (idAfter)))
-        //                        : q.employedItemsCount.gt(cursor).or(q.employedItemsCount.eq(cursor).and(q.id.gt
-        //                        (idAfter)));
-        //            }
-        //            default -> isDesc ? q.id.lt(idAfter) : q.id.gt(idAfter);
-        //        };
-    }
-
     // 정렬 (OrderBy)
-    // sortField 값에 따라 ORDER BY 대상 컬럼이 달라짐: 기본 정렬 컬럼 - id
-    // sortDirection == "desc" (대소문자 무관) -> DESC, 아니면 ASC
-    private OrderSpecifier<?> createOrderSpecifier(String sortField, String sortDirection) {
+    private OrderSpecifier<?>[] createOrderSpecifiers(String sortField, String sortDirection) {
         ComparableExpressionBase<?> target = getSortTarget(sortField);
         Order direction = "DESC".equalsIgnoreCase(sortDirection) ? Order.DESC : Order.ASC;
+        QIndexInformation indexInformation = QIndexInformation.indexInformation;
 
-        return new OrderSpecifier<>(direction, target);
+        return new OrderSpecifier<?>[]{
+                new OrderSpecifier<>(direction, target),
+                new OrderSpecifier<>(direction, indexInformation.id)
+        };
     }
 
     private ComparableExpressionBase<?> getSortTarget(String sortField) {
         QIndexInformation indexInformation = QIndexInformation.indexInformation;
 
         return switch (sortField) {
-            case "indexClassification" -> indexInformation.indexClassification;
             case "indexName" -> indexInformation.indexName;
             case "employedItemsCount" -> indexInformation.employedItemsCount;
-            default -> indexInformation.id;
+            default -> indexInformation.indexClassification;
         };
     }
 }

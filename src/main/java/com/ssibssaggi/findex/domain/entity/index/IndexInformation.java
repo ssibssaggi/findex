@@ -9,8 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
-import com.ssibssaggi.findex.controller.dto.IndexInformationCreateRequest;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +16,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"index_classification", "index_name"})
@@ -36,14 +34,21 @@ public class IndexInformation {
     private Boolean favorite;
     private Boolean enabled;
 
-    public static IndexInformation createWithUser(IndexInformationCreateRequest request) {
+    public static IndexInformation createWithUser(
+            String indexName,
+            String indexClassification,
+            Integer employedItemsCount,
+            String basePointInTime,
+            Float baseIndex,
+            Boolean favorite
+    ) {
         IndexInformation entity = new IndexInformation();
-        entity.indexName = request.indexName();
-        entity.indexClassification = request.indexClassification();
-        entity.employedItemsCount = request.employedItemsCount();
-        entity.basePointInTime = LocalDate.parse(request.basePointInTime());
-        entity.baseIndex = request.baseIndex();
-        entity.favorite = request.favorite();
+        entity.indexName = indexName;
+        entity.indexClassification = indexClassification;
+        entity.employedItemsCount = employedItemsCount;
+        entity.basePointInTime = LocalDate.parse(basePointInTime);
+        entity.baseIndex = baseIndex;
+        entity.favorite = favorite;
         entity.sourceType = SourceType.USER;
         entity.enabled = false;
         return entity;
