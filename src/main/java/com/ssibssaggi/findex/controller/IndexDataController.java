@@ -6,6 +6,8 @@ import com.ssibssaggi.findex.controller.dto.IndexDataResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,18 +26,12 @@ public class IndexDataController {
     @PostMapping()
     public IndexDataResponse createIndexData(
         @RequestBody IndexDataCreateRequest createRequest) {
-        //IndexDataResponse response = indexDataApplication.saveData(createRequest);
-        //log.info("지수 데이터 등록: " + response);
-        //return response;
         return indexDataApplication.saveData(createRequest);
     }
-/*
+
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void deleteIndexData(@PathVariable Long id) {
-        IndexData indexData = indexDataService.read(id);
-        IndexDataResponse response = IndexDataResponse.from(indexData);
-        indexDataService.delete(id);
-        log.info("삭제한 지수 데이터 id : " + id);
-    }*/
+        indexDataApplication.delete(id);
+    }
 }

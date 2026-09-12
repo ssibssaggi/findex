@@ -39,7 +39,7 @@ public class IndexDataApplication {
 
     /*
     @Transactional
-    public void deleteByInfoId(Long indexInfoId) {
+    public void deletedByInfoId(Long indexInfoId) {
 
     }*/
 }
